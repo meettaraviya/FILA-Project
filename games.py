@@ -29,3 +29,21 @@ class ESSGame:
 			return 1 # Defender
 		else:
 			return None
+
+class NimsGame:
+
+	def __init__(self, init_state):
+
+		self.game_state = [init_state, 0]
+
+	def play_move(self, move):
+
+		self.game_state[0][move[0]] -= move[1]
+		self.game_state[1] = 1 - self.game_state[1]
+
+	def get_winner(self):
+
+		if self.game_state[0].sum() == 0:
+			return 1 - self.game_state[1]
+		else:
+			return None
