@@ -21,6 +21,27 @@ class OptimalNimAgent:
 		else:
 			return NimsGameRandomMove(game_state)
 
+class BatchSarsaNonLinearApproximationNimAgent:
+
+	def __init__(self, batch_size=100, n_rows=10):
+
+		self.steps_since_update = 0
+
+		from keras.models import Sequential
+		from keras import backend as K
+		from keras.utils.generic_utils import get_custom_objects
+		
+		get_custom_objects().update({'sine': Activation(K.sin)})
+
+		self.model = Sequential()
+		self.model.add(Dense(units=10, activation='sigmoid', input_dim=n_rows))
+		self.model.add(Dense(units=10, activation='sine'))
+		self.model.compile(loss=keras.losses.categorical_crossentropy,
+              optimizer=keras.optimizers.SGD(lr=0.01, momentum=0.9, nesterov=True))
+
+	def get_move(self, game_state):
+
+
 
 
 
