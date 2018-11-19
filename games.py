@@ -34,16 +34,25 @@ class NimsGame:
 
 	def __init__(self, init_state):
 
-		self.game_state = [init_state, 0]
+		self.board = init_state
+		self.player = 0
 
 	def play_move(self, move):
 
-		self.game_state[0][move[0]] -= move[1]
-		self.game_state[1] = 1 - self.game_state[1]
+		self.board[move[0]] -= move[1]
+		self.player = 1 - self.player
+
+	def get_board(self):
+		return self.board
+
+	def get_player(self):
+		return self.player
 
 	def get_winner(self):
-
-		if self.game_state[0].sum() == 0:
-			return 1 - self.game_state[1]
+		if self.board.sum() == 0:
+			return 1 - self.player
 		else:
 			return None
+
+	def print_game(self):
+		print self.board,self.player
