@@ -1,3 +1,9 @@
+from keras.models import Sequential
+from keras import backend as K
+from keras.utils.generic_utils import get_custom_objects
+from keras.layers import Activation, Dense, Maximum
+import keras
+
 import operator
 import numpy as np
 from games import *
@@ -26,18 +32,14 @@ class OptimalNimAgent:
 		pass
 
 def NN(n_rows):
-	from keras.models import Sequential
-	from keras import backend as K
-	from keras.utils.generic_utils import get_custom_objects
-	
 	get_custom_objects().update({'sine': Activation(K.sin)})
 
 	model = Sequential()
 	model.add(Dense(units=n_rows, activation='sigmoid', input_dim=n_rows))
 	model.add(Dense(units=n_rows, activation='sine'))
-	model.compile(loss=keras.losses.categorical_crossentropy,
-	sgd =keras.optimizers.SGD(lr=0.01, momentum=0.9, nesterov=True))
-	model.compile(loss='binary_crossentropy', optimizer=sgd, metrics=['accuracy'])
+	# model.compile(loss=keras.losses.categorical_crossentropy,
+	# sgd =keras.optimizers.SGD(lr=0.01, momentum=0.9, nesterov=True))
+	model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 	return model
 
 def getNimActions(board):
@@ -91,8 +93,8 @@ class BatchMCNNNimAgent:
 		actions = getNimActions(board)
 		nextStates = getNextState(board,actions)
 		self.time_since_train = self.time_since_train +1
-		self.history[-1].append(s)
-		return actions[self.getBestNextStateIdx(nextstates)]
+		self.history[-1].append(board)
+		return actions[self.getBestNextStateIdx(nextStates)]
 
 	def gameOver(self,win):
 		self.history[-1].append(win)

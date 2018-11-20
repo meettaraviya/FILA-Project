@@ -55,5 +55,5 @@ class NimsGame:
 			return None
 
 	def print_game(self):
-		print self.board,self.player
+		print(self.board,self.player)
 	
