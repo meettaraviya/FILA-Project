@@ -37,6 +37,7 @@ def NN(n_rows):
 	model = Sequential()
 	model.add(Dense(units=n_rows, activation='sigmoid', input_dim=n_rows))
 	model.add(Dense(units=n_rows, activation='sine'))
+	model.add(Dense(units=1, activation='sigmoid'))
 	# model.compile(loss=keras.losses.categorical_crossentropy,
 	# sgd =keras.optimizers.SGD(lr=0.01, momentum=0.9, nesterov=True))
 	model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
@@ -86,8 +87,8 @@ class BatchMCNNNimAgent:
 
 		test = np.array(nextstates, dtype= int)
 		scores = self.model.predict(test)
-		print("BSK",scores)
-		print(max(enumerate(scores), key=operator.itemgetter(1)))
+		# print("BSK",scores)
+		# print(max(enumerate(scores), key=operator.itemgetter(1)))
 		index, value = max(enumerate(scores), key=operator.itemgetter(1))
 		return index
 	
