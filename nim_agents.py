@@ -63,7 +63,7 @@ class BatchMCNNNimAgent:
 	def __init__(self, batch_size=100, n_rows=10):
 		self.steps_since_update = 0
 		self.batch_size = batch_size
-		self.n_rows	= 10
+		self.n_rows	= n_rows
 		self.model = NN(self.n_rows)
 		self.time_since_train = 0
 		self.history = [[]]
@@ -86,6 +86,8 @@ class BatchMCNNNimAgent:
 
 		test = np.array(nextstates, dtype= int)
 		scores = self.model.predict(test)
+		print("BSK",scores)
+		print(max(enumerate(scores), key=operator.itemgetter(1)))
 		index, value = max(enumerate(scores), key=operator.itemgetter(1))
 		return index
 	
@@ -105,7 +107,7 @@ if __name__ == "__main__":
 	init_board = np.array([8,3,2,4,1,12], dtype=int)
 	print(init_board)
 	game = NimsGame(init_board)
-	agents = [OptimalNimAgent(), BatchMCNNNimAgent()]
+	agents = [OptimalNimAgent(), BatchMCNNNimAgent(n_rows=len(init_board))]
 
 	while game.get_winner() is None:
 		game.print_game()
