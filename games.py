@@ -56,3 +56,4 @@ class NimsGame:
 
 	def print_game(self):
 		print self.board,self.player
+	
