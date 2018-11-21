@@ -69,6 +69,14 @@ def NN(n_rows, limit):
 	model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 	return model
 
+def NN2(n_rows, limit):
+	# get_custom_objects().update({'sine': Activation(K.sin)})
+	model = Sequential()
+	model.add(Dense(units=n_rows+1, activation='sigmoid', input_dim=limit*n_rows+1))
+	model.add(Dense(units=1, activation='sigmoid'))
+	model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+	return model
+
 def getNimActions(board):
 	actions = []
 	for i in range(len(board)):
@@ -82,7 +90,7 @@ def getNextState(board,actions):
 	b = board.copy()
 	for act in actions:		
 		b[act[0]] -= act[1] 
-		nextstates.append(b)
+		nextstates.append(b.copy())
 	return nextstates
 
 class BatchMCNNNimAgent:
@@ -102,6 +110,7 @@ class BatchMCNNNimAgent:
 		y_train = [ [h[-1]]*(len(h)-1) for h in self.history[:self.completed_runs]]
 		x_train = np.array(list(itertools.chain.from_iterable(x_train)),dtype= int)
 		y_train = np.array(list(itertools.chain.from_iterable(y_train)),dtype= int)
+		import pdb; pdb.set_trace()
 
 		self.model.fit(x_train,y_train, epochs=10)
 
@@ -120,10 +129,15 @@ class BatchMCNNNimAgent:
 		return index
 	
 	def get_move(self, board):
+		
 		actions = getNimActions(board)
 		nextStates = getNextState(board,actions)
 		self.time_since_train = self.time_since_train +1
-		self.history[-1].append(board)
+		# import pdb; pdb.set_trace()
+		# print(self.history)
+		self.history[len(self.history)-1].append(board.copy())
+		# import pdb; pdb.set_trace()
+		# print(self.history)
 		return actions[self.getBestNextStateIdx(nextStates)]
 
 	def gameOver(self,win):
@@ -133,7 +147,7 @@ class BatchMCNNNimAgent:
 
 if __name__ == "__main__":
 	# print(init_board)
-	np.random.seed(1)
+	np.random.seed(0)
 	agents = [BatchMCNNNimAgent(n_rows=n_rows), OptimalNimAgent()]
 	# agents = [OptimalNimAgent(),OptimalNimAgent()]
 	wins = 0
