@@ -87,11 +87,12 @@ def getNimActions(board):
 
 def getNextState(board,actions):
 	nextstates = []
-	b = board.copy()
 	for act in actions:		
+		b = board.copy()
 		b[act[0]] -= act[1] 
 		nextstates.append(b.copy())
 	return nextstates
+
 
 class BatchMCNNNimAgent:
 
@@ -100,18 +101,30 @@ class BatchMCNNNimAgent:
 		self.batch_size = batch_size
 		self.n_rows	= n_rows
 		self.limit = limit
-		self.model = NN(self.n_rows, self.limit)
+		self.model = NN2(self.n_rows, self.limit)
 		self.time_since_train = 0
 		self.history = [[]]
 		self.completed_runs = 0
+
+	def NN_trans(self,states):
+		stts = [ list(itertools.chain.from_iterable([list(bin(i)[2:].zfill(self.limit)) for i in z])) for z in states]
+		for x in stts:
+			x.append(1)
+		# import pdb; pdb.set_trace()
+		return np.array(stts,dtype= int)
+
 
 	def train(self):
 		x_train = [h[:-1] for h in self.history[:self.completed_runs]]
 		y_train = [ [h[-1]]*(len(h)-1) for h in self.history[:self.completed_runs]]
 		x_train = np.array(list(itertools.chain.from_iterable(x_train)),dtype= int)
 		y_train = np.array(list(itertools.chain.from_iterable(y_train)),dtype= int)
-		import pdb; pdb.set_trace()
 
+		# import pdb; pdb.set_trace()
+		# x = np.array([ np.array(list(itertools.chain.from_iterable( [ list(bin(i)[2:].zfill(limit)) for i in _x ])) ,dtype=int) for _x in x_train])
+		x_train = self.NN_trans(x_train)
+
+			
 		self.model.fit(x_train,y_train, epochs=10)
 
 	def getBestNextStateIdx(self,nextstates):
@@ -121,7 +134,7 @@ class BatchMCNNNimAgent:
 			self.history = [[]]
 			self.completed_runs = 0
 
-		test = np.array(nextstates, dtype= int)
+		test = self.NN_trans(nextstates)
 		scores = self.model.predict(test)
 		# print("BSK",scores)
 		# print(max(enumerate(scores), key=operator.itemgetter(1)))
@@ -132,6 +145,7 @@ class BatchMCNNNimAgent:
 		
 		actions = getNimActions(board)
 		nextStates = getNextState(board,actions)
+		# print(board,actions,nextStates)
 		self.time_since_train = self.time_since_train +1
 		# import pdb; pdb.set_trace()
 		# print(self.history)
@@ -148,7 +162,7 @@ class BatchMCNNNimAgent:
 if __name__ == "__main__":
 	# print(init_board)
 	np.random.seed(0)
-	agents = [BatchMCNNNimAgent(n_rows=n_rows), OptimalNimAgent()]
+	agents = [ OptimalNimAgent(),BatchMCNNNimAgent(n_rows=n_rows)]
 	# agents = [OptimalNimAgent(),OptimalNimAgent()]
 	wins = 0
 	games = [NimsGame(np.random.randint(2**limit, size=n_rows).copy()) for i in range(1000)]
