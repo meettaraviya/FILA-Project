@@ -176,13 +176,11 @@ if __name__ == "__main__":
 			print("Wins=", wins)
 			wins = 0
 		game = games[_%1000]
-		# print(_)
 
 		while game.get_winner() is None:
 			# game.print_game()
 			move = agents[game.get_player()].get_move(game.get_board())
 			game.play_move(move)
-		# print(move)
 
 		agents[0].gameOver(1-game.get_winner())
 		agents[1].gameOver(game.get_winner())
