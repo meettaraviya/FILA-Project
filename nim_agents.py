@@ -2,6 +2,7 @@ from keras.models import Sequential
 from keras import backend as K
 from keras.utils.generic_utils import get_custom_objects
 from keras.layers import Activation, Dense, Maximum
+from keras import optimizers
 import keras
 import  itertools
 
@@ -66,15 +67,15 @@ def NN(n_rows, limit):
 	model.add(Dense(units=(limit+1)*n_rows, activation='sine', input_dim=n_rows))
 	model.add(Dense(units=limit+1, activation='sine'))
 	model.add(Dense(units=1, activation='sigmoid'))
-	model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+	model.compile(loss='binary_crossentropy', optimizer=optimizers.SGD(lr=0.001), metrics=['accuracy'])
 	return model
 
-def NN2(n_rows, limit):
-	# get_custom_objects().update({'sine': Activation(K.sin)})
+def NN_ohe(n_rows, limit):
+	get_custom_objects().update({'sine': Activation(K.sin)})
 	model = Sequential()
-	model.add(Dense(units=n_rows+1, activation='sigmoid', input_dim=limit*n_rows+1))
+	model.add(Dense(units=limit+1, activation='sine', input_dim=limit*n_rows))
 	model.add(Dense(units=1, activation='sigmoid'))
-	model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
+	model.compile(loss='binary_crossentropy', optimizer=optimizers.SGD(lr=0.001), metrics=['accuracy'])
 	return model
 
 def getNimActions(board):
@@ -101,15 +102,15 @@ class BatchMCNNNimAgent:
 		self.batch_size = batch_size
 		self.n_rows	= n_rows
 		self.limit = limit
-		self.model = NN2(self.n_rows, self.limit)
+		self.model = NN_ohe(self.n_rows, self.limit)
 		self.time_since_train = 0
 		self.history = [[]]
 		self.completed_runs = 0
 
 	def NN_trans(self,states):
 		stts = [ list(itertools.chain.from_iterable([list(bin(i)[2:].zfill(self.limit)) for i in z])) for z in states]
-		for x in stts:
-			x.append(1)
+		# for x in stts:
+		# 	x.append(1)
 		# import pdb; pdb.set_trace()
 		return np.array(stts,dtype= int)
 
@@ -125,14 +126,9 @@ class BatchMCNNNimAgent:
 		x_train = self.NN_trans(x_train)
 
 			
-		self.model.fit(x_train,y_train, epochs=10)
+		self.model.fit(x_train,y_train, epochs=10, verbose=2)
 
 	def getBestNextStateIdx(self,nextstates):
-		if self.time_since_train == 100 and self.completed_runs>0:
-			self.time_since_train = 0
-			self.train()
-			self.history = [[]]
-			self.completed_runs = 0
 
 		test = self.NN_trans(nextstates)
 		scores = self.model.predict(test)
@@ -146,12 +142,19 @@ class BatchMCNNNimAgent:
 		actions = getNimActions(board)
 		nextStates = getNextState(board,actions)
 		# print(board,actions,nextStates)
-		self.time_since_train = self.time_since_train +1
+		self.time_since_train += 1
 		# import pdb; pdb.set_trace()
 		# print(self.history)
 		self.history[len(self.history)-1].append(board.copy())
 		# import pdb; pdb.set_trace()
 		# print(self.history)
+
+		if self.time_since_train == 100 and self.completed_runs>0:
+			self.time_since_train = 0
+			self.train()
+			# self.history = [[]]
+			# self.completed_runs = 0
+
 		return actions[self.getBestNextStateIdx(nextStates)]
 
 	def gameOver(self,win):
@@ -162,20 +165,21 @@ class BatchMCNNNimAgent:
 if __name__ == "__main__":
 	# print(init_board)
 	np.random.seed(0)
-	agents = [ OptimalNimAgent(),BatchMCNNNimAgent(n_rows=n_rows)]
+	agents = [ EpsilonRandomNimAgent(1),BatchMCNNNimAgent(n_rows=n_rows)]
 	# agents = [OptimalNimAgent(),OptimalNimAgent()]
 	wins = 0
 	games = [NimsGame(np.random.randint(2**limit, size=n_rows).copy()) for i in range(1000)]
 
-	winner = [np.bitwise_xor.reduce(games[i].board) == 0 for i in range(1000)]
-	print(sum(winner))
+	# winner = [np.bitwise_xor.reduce(games[i].board) == 0 for i in range(1000)]
+	# print(sum(winner))
 	
 	for _ in range(1000000):
 		if (_)%1000 == 999:
 			# agents[0] = EpsilonRandomNimAgent(1)
 			print("Wins=", wins)
 			wins = 0
-		game = games[_%1000]
+			agents[0].epsilon = min(1000/(1+_), 1)
+		game = NimsGame(np.random.randint(2**limit, size=n_rows))
 
 		while game.get_winner() is None:
 			# game.print_game()
@@ -186,4 +190,4 @@ if __name__ == "__main__":
 		agents[1].gameOver(game.get_winner())
 		wins += game.get_winner()
 
-	print("Total Wins=", sum(winner))
+	# print("Total Wins=", sum(winner))
