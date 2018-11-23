@@ -219,47 +219,47 @@ if __name__ == "__main__":
 		agents[1].gameOver(game.get_winner())
 		wins += game.get_winner()
 
-	other_agent = agents[1]
-	agents[1] = OptimalNimAgent()
+	# other_agent = agents[1]
+	# agents[1] = OptimalNimAgent()
 
-	for _ in range(10000):
-		if (_)%1000 == 999:
+	# for _ in range(10000):
+	# 	if (_)%1000 == 999:
 
-			print("Wins =", wins)#, "Epsilon =", agents[0].epsilon)
-			wins = 0
-			# agents[0].epsilon = min(10000/(1+_), 1)
+	# 		print("Wins =", wins)#, "Epsilon =", agents[0].epsilon)
+	# 		wins = 0
+	# 		# agents[0].epsilon = min(10000/(1+_), 1)
 
-		game = NimsGame(np.random.randint(2**limit, size=n_rows))
+	# 	game = NimsGame(np.random.randint(2**limit, size=n_rows))
 
-		while game.get_winner() is None:
+	# 	while game.get_winner() is None:
 
-			move = agents[game.get_player()].get_move(game.get_board())
-			game.play_move(move, train=False)
+	# 		move = agents[game.get_player()].get_move(game.get_board())
+	# 		game.play_move(move, train=False)
 
-		agents[0].gameOver(1-game.get_winner())
-		agents[1].gameOver(game.get_winner())
-		wins += game.get_winner()
+	# 	agents[0].gameOver(1-game.get_winner())
+	# 	agents[1].gameOver(game.get_winner())
+	# 	wins += game.get_winner()
 	
-	agents[1] = other_agent
+	# agents[1] = other_agent
 	
-	other_agent = agents[0]
-	agents[0] = OptimalNimAgent()
+	# other_agent = agents[0]
+	# agents[0] = OptimalNimAgent()
 
-	for _ in range(10000):
-		if (_)%1000 == 999:
+	# for _ in range(10000):
+	# 	if (_)%1000 == 999:
 
-			print("Wins =", wins)#, "Epsilon =", agents[0].epsilon)
-			wins = 0
-			# agents[0].epsilon = min(10000/(1+_), 1)
+	# 		print("Wins =", wins)#, "Epsilon =", agents[0].epsilon)
+	# 		wins = 0
+	# 		# agents[0].epsilon = min(10000/(1+_), 1)
 
-		game = NimsGame(np.random.randint(2**limit, size=n_rows))
+	# 	game = NimsGame(np.random.randint(2**limit, size=n_rows))
 
-		while game.get_winner() is None:
+	# 	while game.get_winner() is None:
 
-			move = agents[game.get_player()].get_move(game.get_board())
-			game.play_move(move, train=False)
+	# 		move = agents[game.get_player()].get_move(game.get_board())
+	# 		game.play_move(move, train=False)
 
-		agents[0].gameOver(1-game.get_winner())
-		agents[1].gameOver(game.get_winner())
-		wins += game.get_winner()
+	# 	agents[0].gameOver(1-game.get_winner())
+	# 	agents[1].gameOver(game.get_winner())
+	# 	wins += game.get_winner()
 
