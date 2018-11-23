@@ -7,12 +7,12 @@ import numpy as np
 
 get_custom_objects().update({'sine': Activation(lambda x: K.sigmoid(10*K.sin(x)))})
 
-n_rows = 5
+n_rows = 3
 limit = 5
 
 model = Sequential()
 model.add(Dense(units=(limit+1)*n_rows, activation='sine', input_dim=n_rows))
-model.add(Dense(units=limit+1, activation='sine'))
+model.add(Dense(units=limit, activation='sine'))
 model.add(Dense(units=1, activation='sigmoid'))
 model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
 npoints_x = 1000000
